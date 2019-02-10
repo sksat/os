@@ -1,5 +1,7 @@
 ISO		= os.iso
 
+DEPS	= src/kernel.bin
+
 IMG_DIR	= image
 BOOT_DIR= $(IMG_DIR)/boot
 GRUB_DIR= $(IMG_DIR)/boot/grub
@@ -8,14 +10,17 @@ QEMU=qemu-system-x86_64
 
 # command
 
-default: iso
+default:
+	make iso
 
 build:
 	make -C src
 
 iso: $(ISO)
 
-run: $(ISO)
+run:
+	make build
+	make $(ISO)
 	$(QEMU) -drive format=raw,file=$(ISO)
 
 clean:
@@ -23,7 +28,7 @@ clean:
 	rm -rf $(IMG_DIR)
 	make -C src clean
 
-$(ISO):
+$(ISO):$(DEPS)
 	make build
 	mkdir -p $(GRUB_DIR)
 	cp grub.cfg $(GRUB_DIR)
