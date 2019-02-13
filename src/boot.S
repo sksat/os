@@ -15,23 +15,27 @@
 	#define EXT_C(fn)		fn
 #endif
 
+.intel_syntax noprefix
+
 multiboot_header:
 	.long	MULTIBOOT2_HEADER_MAGIC
 	.long	MULTIBOOT_ARCHITECTURE_I386
 	.long	HEADER_SIZE
 	.long	HEADER_CHECKSUM
+
+end_tag:
 	.short	MULTIBOOT_HEADER_TAG_END
 	.short	0
 	.long	8
 multiboot_header_end:
 
-.intel_syntax noprefix
 .global entry
 
 .section .text
 .code32
 
 entry:
+	cli
 	mov		esp, stack+STACK_SIZE	// initialize stack
 
 	push	0
@@ -41,14 +45,9 @@ entry:
 	push	eax		// magic value
 	call	EXT_C(kmain)
 
-	mov		dword ptr [0xb8000], 0x2f4b2f4b		// puts("OK")
-
 loop:
 	hlt
 	jmp		loop
-
-halt_message:
-	.asciz	"Halted."
 
 // stack
 	.comm	stack, STACK_SIZE
