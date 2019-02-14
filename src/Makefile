@@ -6,7 +6,7 @@ CXX		= g++
 LD		= ld
 
 CFLAGS	=
-CXXFLAGS= -m32 -O0 -g -Wall -Wextra -nostdinc \
+CXXFLAGS= -std=c++17 -m32 -O0 -g -Wall -Wextra -nostdinc \
 		  -ffreestanding -fno-builtin -fno-exceptions -fno-rtti -fomit-frame-pointer
 LDFLAGS	= -melf_i386 -T linker.ld -n
 

@@ -5,30 +5,50 @@
 #define LINES		24
 #define ATTRIBUTE	7
 
-// functions
-void cls();
-void putchar(int x, int y, int c);
+class TextMode {
+public:
+	volatile unsigned char *vram;
+	int x=0, y=0;
+
+	void clear();
+	void putchar(const unsigned int x, const unsigned int y, const char c);
+	void putchar(const char c){ putchar(x,y,c); }
+	void puts(const char *str);
+};
 
 extern "C" void kmain(unsigned long magic, unsigned long addr){
-	cls();
+	TextMode tty;
+	tty.vram = (unsigned char*) VRAM;
 
-	putchar(0, 1, 'A');
-	putchar(1, 1, 'B');
-	putchar(2, 1, 'C');
+	tty.clear();
+	tty.puts("hello");
 
 	while(1);
 	return;
 }
 
-void cls(){
-	volatile unsigned char* vram = (unsigned char*) VRAM;
+void TextMode::clear(){
 	for(int i=0;i<COLUMNS*LINES*2;i++)
 		*(vram+i) = 0;
 }
 
-void putchar(int x, int y, int c){
-	volatile unsigned char *vram = (unsigned char*) VRAM;
+void TextMode::putchar(const unsigned int x, const unsigned int y, const char c){
 	auto addr = vram + (x + y * COLUMNS)*2;
 	*addr = c & 0xff;
 	*(addr+1) = ATTRIBUTE;
+}
+
+void TextMode::puts(const char *str){
+	for(int i=0;;i++){
+		if(str[i] == '\t')
+			x+=4;
+		else if(str[i] == '\n')
+			y++;
+		else if(str[i] == '\0')
+			break;
+		else{
+			putchar(str[i]);
+			x++;
+		}
+	}
 }
