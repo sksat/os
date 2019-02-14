@@ -1,12 +1,12 @@
 KERNEL	= kernel.bin
-OBJS	= boot.o main.o
+OBJS	= boot.o main.o vram.o tty.o
 
 CC		= gcc
 CXX		= g++
 LD		= ld
 
 CFLAGS	=
-CXXFLAGS= -std=c++17 -m32 -O0 -g -Wall -Wextra -nostdinc \
+CXXFLAGS= -std=c++17 -m32 -O0 -g -Wall -Wextra \
 		  -ffreestanding -fno-builtin -fno-exceptions -fno-rtti -fomit-frame-pointer
 LDFLAGS	= -melf_i386 -T linker.ld -n
 
