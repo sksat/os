@@ -2,6 +2,7 @@
 #include "common.h"
 #include "vram.h"
 #include "tty.h"
+#include "util.h"
 
 #define VRAM_ADDR	(addr_t)0xB8000
 #define COLUMNS		80
@@ -12,8 +13,17 @@ extern "C" void kmain(unsigned long magic, unsigned long addr){
 	VRAM::TextMode vram(VRAM_ADDR, COLUMNS, LINES);
 	Tty tty(&vram);
 
-	tty.puts("hello, world!\n");
-	tty.puts("tab\ttest\n");
+	char buf[COLUMNS];
+
+	tty.clear();
+	tty.puts("booting...\n");
+
+	// check magic
+	tty.printf("magic=%x", magic);
+	if(magic == MULTIBOOT2_BOOTLOADER_MAGIC)
+		tty.puts("\t[ok]\n");
+
+	tty.printf("addr=%x\n", addr);
 
 	while(1);
 	return;

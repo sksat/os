@@ -36,3 +36,14 @@ void Tty::puts(const char *str){
 		putchar(str[i]);
 	}
 }
+
+void Tty::printf(const char *fmt, ...){
+	va_list ap;
+	char buf[160];
+
+	va_start(ap, fmt);
+	util::vsprintf(buf, fmt, ap);
+	va_end(ap);
+
+	puts(buf);
+}

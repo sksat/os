@@ -2,6 +2,7 @@
 #define TTY_H_
 
 #include "vram.h"
+#include "util.h"
 
 class Tty {
 private:
@@ -14,6 +15,7 @@ public:
 	void clear();
 	void putchar(const char c);
 	void puts(const char *str);
+	void printf(const char *fmt, ...);
 };
 
 #endif
