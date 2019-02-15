@@ -25,6 +25,7 @@ extern "C" void kmain(multiboot::uint32_t magic, multiboot::uint32_t addr){
 	minfo->parse_tags();
 
 	// VRAM
+	using VRAM::Color;
 	if(minfo->is_vram_text())
 		vram	= new(&_vram_text) VRAM::TextMode();
 	else
@@ -38,14 +39,14 @@ extern "C" void kmain(multiboot::uint32_t magic, multiboot::uint32_t addr){
 	tty << "booting...\n";
 
 	// check magic
-	tty << "magic=" << (uint64_t)magic;
+	tty << "magic=" << Color::Red <<(uint64_t)magic << Color::White;
 	if(minfo->check_magic())
 		tty << "\t[ok]\n";
-	tty << "addr=" << (uint64_t)addr << "\n";
+	tty << "addr=" << Color::Red << (uint64_t)addr << Color::White << "\n";
 
 	tty << "multiboot tag num=" << minfo->get_tag_num() << "\n";
 
-	tty << "boot loader: " << minfo->bootloader() << "\n";
+	tty << "boot loader: " << Color::Green << minfo->bootloader() << Color::White << "\n";
 
 	auto meminfo = minfo->tags.basic_meminfo;
 	tty << "Memory: lower=" << (uint64_t)meminfo->lower

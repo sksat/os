@@ -10,5 +10,5 @@ void TextMode::clear(){
 void TextMode::putchar(const size_t x, const size_t y, const char c){
 	auto addr = vram + (x + y * width)*2;
 	*addr		= c;
-	*(addr+1)	= 7;
+	*(addr+1)	= static_cast<uint8_t>(color);
 }

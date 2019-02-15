@@ -19,6 +19,12 @@ public:
 	void puts(const char *str);
 	void printf(const char *fmt, ...);
 
+	using Color = VRAM::Color;
+	Tty& operator<<(const Color &c){
+		vram->set_color(static_cast<Color>(static_cast<uint8_t>(vram->color)>>4), c);
+		return *this;
+	}
+
 	Tty& operator<<(const char &c){
 		putchar(c);
 		return *this;
