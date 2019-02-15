@@ -74,6 +74,38 @@ extern "C" void kmain(multiboot::uint32_t magic, multiboot::uint32_t addr){
 			break;
 	}
 
+	auto mmap = minfo->tags.mmap;
+	int mmap_num = (mmap->size-sizeof(uint32_t)*4)/sizeof(multiboot::mmap_entry);
+	tty << "mmap: size=" << mmap->size
+		<< ", num=" << mmap_num
+		<< ", version=" << mmap->entry_version
+		<< "\n";
+
+	for(int i=0;i<mmap_num;i++){
+		auto& entry = mmap->entries[i];
+		tty << "\t" << i << ": base addr=" << entry.addr
+			<< ", len=" << entry.len << " ";
+		switch(entry.type){
+		using namespace multiboot;
+		case Memory::Available:
+			tty << "(available)";
+			break;
+		case Memory::Reserved:
+			tty << "(reserved)";
+			break;
+		case Memory::AcpiReclaimable:
+			tty << "(ACPI reclaimable)";
+			break;
+		case Memory::NVS:
+			tty << "(NVS)";
+			break;
+		case Memory::BadRAM:
+			tty << "(BAD)";
+			break;
+		}
+		tty << "\n";
+	}
+
 	while(1);
 	return;
 }

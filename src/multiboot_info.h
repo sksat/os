@@ -12,26 +12,26 @@ namespace multiboot {
 		bool acpi_new;
 	public:
 		struct tags_t {
-			tag_string			*cmdline;
-			tag_string			*bootloader;
-			tag_module			*module;
-			tag_basic_meminfo	*basic_meminfo;
-			tag_bootdev			*bootdev;
-			tag_mmap			*mmap;
-			tag_vbe				*vbe;
-			tag_framebuffer		*framebuffer;
-			tag_elf_sections	*elf_sections;
-			tag_apm				*apm;
-			tag_efi32			*efi32;
-			tag_efi64			*efi64;
-			tag_smbios			*smbios;
-			tag_acpi			*acpi;
-			tag_network			*network;
-			tag_efi_mmap		*efi_mmap;
-			tag					*efi_bs;
-			tag_efi32_ih		*efi32_ih;
-			tag_efi64_ih		*efi64_ih;
-			tag_load_base_addr	*load_base_addr;
+			tag_string			*cmdline		= nullptr;
+			tag_string			*bootloader		= nullptr;
+			tag_module			*module			= nullptr;
+			tag_basic_meminfo	*basic_meminfo	= nullptr;
+			tag_bootdev			*bootdev		= nullptr;
+			tag_mmap			*mmap			= nullptr;
+			tag_vbe				*vbe			= nullptr;
+			tag_framebuffer		*framebuffer	= nullptr;
+			tag_elf_sections	*elf_sections	= nullptr;
+			tag_apm				*apm			= nullptr;
+			tag_efi32			*efi32			= nullptr;
+			tag_efi64			*efi64			= nullptr;
+			tag_smbios			*smbios			= nullptr;
+			tag_acpi			*acpi			= nullptr;
+			tag_network			*network		= nullptr;
+			tag_efi_mmap		*efi_mmap		= nullptr;
+			tag					*efi_bs			= nullptr;
+			tag_efi32_ih		*efi32_ih		= nullptr;
+			tag_efi64_ih		*efi64_ih		= nullptr;
+			tag_load_base_addr	*load_base_addr	= nullptr;
 		};
 		tags_t tags;
 
