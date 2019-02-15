@@ -21,31 +21,46 @@ extern "C" void kmain(unsigned long magic, unsigned long addr){
 	if(magic == MULTIBOOT2_BOOTLOADER_MAGIC)
 		tty.puts("\t[ok]\n");
 
-	tty.printf("addr=%x\n", addr);
+	tty.printf("addr=%x", addr);
 
-	auto tag = (multiboot_tag*) (addr + 8);
+	auto tag = (multiboot::tag*) (addr + 8);
 
-	while(tag->type != MULTIBOOT_TAG_TYPE_END){
+	while(tag->type != multiboot::tag::End){
+		using namespace multiboot;
 		tty.printf("tag type=%d, size=%x\n", tag->type, tag->size);
 
 		switch(tag->type){
-		case MULTIBOOT_TAG_TYPE_CMDLINE:
+		case tag::CmdLine:
 			tty.puts("\tcmdline: ");
-			tty.puts(((multiboot_tag_string*)tag)->string);
+			tty.puts(((tag_string*)tag)->string);
+			tty.puts("\n");
 			break;
-		case MULTIBOOT_TAG_TYPE_BOOT_LOADER_NAME:
+		case multiboot::tag::BootLoaderName:
 			tty.puts("\tboot loader: ");
-			tty.puts(((multiboot_tag_string*)tag)->string);
+			tty.puts(((tag_string*)tag)->string);
+			tty.puts("\n");
 			break;
-		case MULTIBOOT_TAG_TYPE_BASIC_MEMINFO:
-			tty.printf("\tlower=%x, upper=%x",
-					((multiboot_tag_basic_meminfo*)tag)->mem_lower,
-					((multiboot_tag_basic_meminfo*)tag)->mem_upper);
+		case multiboot::tag::BasicMemInfo:
+			tty.printf("\tlower=%x, upper=%x\n",
+					((tag_basic_meminfo*)tag)->mem_lower,
+					((tag_basic_meminfo*)tag)->mem_upper);
+			break;
+		case multiboot::tag::FrameBuffer:
+			{
+				auto t = (tag_framebuffer*)tag;
+				tty.printf("\taddr=%x, pitch=%d\n",
+						t->common.addr,
+						t->common.pitch);
+				tty.printf("\twidth=%d, height=%d, bpp=%d",
+						t->common.width,
+						t->common.height,
+						t->common.bpp);
+			}
+		default:
 			break;
 		}
-		tty.puts("\n");
 
-		tag = (multiboot_tag*) ((multiboot_uint8_t*) tag + ((tag->size+7) & ~7));
+		tag = (multiboot::tag*) ((multiboot::uint8_t*) tag + ((tag->size+7) & ~7));
 	}
 
 	while(1);
