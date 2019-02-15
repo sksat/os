@@ -1,5 +1,11 @@
 #include "tty.h"
 
+void Tty::init(VRAM::Base *vram){
+	x = 0;
+	y = 0;
+	this->vram = vram;
+}
+
 void Tty::clear(){
 	vram->clear();
 	x = 0;

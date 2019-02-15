@@ -10,7 +10,9 @@ private:
 	VRAM::Base *vram;
 
 public:
-	explicit Tty(VRAM::Base *vram) : vram(vram) {}
+	Tty() : x(0), y(0), vram(nullptr) {}
+
+	void init(VRAM::Base *vram);
 
 	void clear();
 	void putchar(const char c);
