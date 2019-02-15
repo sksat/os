@@ -36,11 +36,14 @@ extern "C" void kmain(multiboot::uint32_t magic, multiboot::uint32_t addr){
 	tty.printf("Memory: lower=%x, upper=%x\n", meminfo->lower, meminfo->upper);
 
 	auto vraminfo = minfo.tags.framebuffer;
-	tty.printf("VRAM: addr=%x, width=%d, height=%d, bpp=%d ",
+
+	tty.printf("VRAM: addr=%x, pitch=%d, width=%d, height=%d, bpp=%d, mode=",
 			vraminfo->common.addr,
+			vraminfo->common.pitch,
 			vraminfo->common.width,
 			vraminfo->common.height,
-			vraminfo->common.bpp);
+			(int)vraminfo->common.bpp);
+
 	switch(vraminfo->common.ftype){
 		using namespace multiboot;
 		case FrameBuffer::indexed:

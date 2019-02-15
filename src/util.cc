@@ -51,7 +51,7 @@ int vsprintf(char *buf, const char *fmt, va_list args){
 			i+= itoa(l, buf+i, 10);
 			break;
 		case 'x':
-			l = va_arg(args, int);
+			l = va_arg(args, long long);
 			buf[i++]='0';
 			buf[i++]='x';
 			i+= itoa(l, buf+i, 16);
