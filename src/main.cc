@@ -3,13 +3,17 @@
 #include "vram.h"
 #include "tty.h"
 #include "util.h"
+#include "multiboot_info.h"
 
 #define VRAM_ADDR	(addr_t)0xB8000
 #define COLUMNS		80
 #define LINES		24
 #define ATTRIBUTE	7
 
-extern "C" void kmain(unsigned long magic, unsigned long addr){
+extern "C" void kmain(multiboot::uint32_t magic, multiboot::uint32_t addr){
+	multiboot::Info minfo(magic, addr);
+	minfo.parse_tags();
+
 	VRAM::TextMode vram(VRAM_ADDR, COLUMNS, LINES);
 	Tty tty(&vram);
 
@@ -18,49 +22,36 @@ extern "C" void kmain(unsigned long magic, unsigned long addr){
 
 	// check magic
 	tty.printf("magic=%x", magic);
-	if(magic == MULTIBOOT2_BOOTLOADER_MAGIC)
+	if(minfo.check_magic())
 		tty.puts("\t[ok]\n");
+	tty.printf("addr=%x\n", addr);
 
-	tty.printf("addr=%x", addr);
+	tty.printf("multiboot tag num=%d\n", minfo.get_tag_num());
 
-	auto tag = (multiboot::tag*) (addr + 8);
+	tty.puts("boot loader: ");
+	tty.puts(minfo.bootloader());
+	tty.puts("\n");
 
-	while(tag->type != multiboot::tag::End){
+	auto meminfo = minfo.tags.basic_meminfo;
+	tty.printf("Memory: lower=%x, upper=%x\n", meminfo->lower, meminfo->upper);
+
+	auto vraminfo = minfo.tags.framebuffer;
+	tty.printf("VRAM: addr=%x, width=%d, height=%d, bpp=%d ",
+			vraminfo->common.addr,
+			vraminfo->common.width,
+			vraminfo->common.height,
+			vraminfo->common.bpp);
+	switch(vraminfo->common.ftype){
 		using namespace multiboot;
-		tty.printf("tag type=%d, size=%x\n", tag->type, tag->size);
-
-		switch(tag->type){
-		case tag::CmdLine:
-			tty.puts("\tcmdline: ");
-			tty.puts(((tag_string*)tag)->string);
-			tty.puts("\n");
+		case FrameBuffer::indexed:
+			tty.puts("indexed\n");
 			break;
-		case multiboot::tag::BootLoaderName:
-			tty.puts("\tboot loader: ");
-			tty.puts(((tag_string*)tag)->string);
-			tty.puts("\n");
+		case FrameBuffer::rgb:
+			tty.puts("RGB\n");
 			break;
-		case multiboot::tag::BasicMemInfo:
-			tty.printf("\tlower=%x, upper=%x\n",
-					((tag_basic_meminfo*)tag)->mem_lower,
-					((tag_basic_meminfo*)tag)->mem_upper);
+		case FrameBuffer::text:
+			tty.puts("text\n");
 			break;
-		case multiboot::tag::FrameBuffer:
-			{
-				auto t = (tag_framebuffer*)tag;
-				tty.printf("\taddr=%x, pitch=%d\n",
-						t->common.addr,
-						t->common.pitch);
-				tty.printf("\twidth=%d, height=%d, bpp=%d",
-						t->common.width,
-						t->common.height,
-						t->common.bpp);
-			}
-		default:
-			break;
-		}
-
-		tag = (multiboot::tag*) ((multiboot::uint8_t*) tag + ((tag->size+7) & ~7));
 	}
 
 	while(1);

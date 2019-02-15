@@ -98,6 +98,8 @@ namespace multiboot {
 
 	constexpr uint32_t bootloader_magic = MULTIBOOT2_BOOTLOADER_MAGIC;
 
+	// struct
+
 	struct header {
 		uint32_t magic;
 		uint32_t arch;
@@ -257,8 +259,8 @@ namespace multiboot {
 	struct tag_basic_meminfo {
 		uint32_t type;
 		uint32_t size;
-		uint32_t mem_lower;
-		uint32_t mem_upper;
+		uint32_t lower;
+		uint32_t upper;
 	};
 
 	struct tag_bootdev {
@@ -303,10 +305,11 @@ namespace multiboot {
 #define MULTIBOOT_FRAMEBUFFER_TYPE_RGB		1
 #define MULTIBOOT_FRAMEBUFFER_TYPE_EGA_TEXT	2
 
-	enum class FramebufferType : uint8_t {
+	enum class FrameBuffer : uint8_t {
 		indexed	= MULTIBOOT_FRAMEBUFFER_TYPE_INDEXED,
 		rgb,
 		ega_text,
+		text = ega_text,
 	};
 
 	struct tag_framebuffer {
@@ -319,7 +322,7 @@ namespace multiboot {
 			uint32_t width;
 			uint32_t height;
 			uint8_t  bpp;
-			FramebufferType ftype; // uint8_t
+			FrameBuffer ftype; // uint8_t
 			uint16_t reserved;
 		};
 
