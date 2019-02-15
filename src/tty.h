@@ -10,7 +10,7 @@ private:
 	VRAM::Base *vram;
 
 public:
-	Tty() : x(0), y(0), vram(nullptr) {}
+	Tty(VRAM::Base *vram) : x(0), y(0), vram(vram) {}
 
 	void init(VRAM::Base *vram);
 
@@ -18,6 +18,27 @@ public:
 	void putchar(const char c);
 	void puts(const char *str);
 	void printf(const char *fmt, ...);
+
+	Tty& operator<<(const char &c){
+		putchar(c);
+		return *this;
+	}
+	Tty& operator<<(const char *str){
+		puts(str);
+		return *this;
+	}
+	Tty& operator<<(const int val){
+		printf("%d", val);
+		return *this;
+	}
+	Tty& operator<<(const uint32_t val){
+		printf("%d", val);
+		return *this;
+	}
+	Tty& operator<<(const uint64_t val){
+		printf("%x", val);
+		return *this;
+	}
 };
 
 #endif

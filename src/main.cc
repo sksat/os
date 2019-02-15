@@ -14,12 +14,10 @@ void operator delete(void*, void*) noexcept {
 
 multiboot::Info	_minfo;
 VRAM::TextMode	_vram_text;
-Tty				_tty;
 
 extern "C" void kmain(multiboot::uint32_t magic, multiboot::uint32_t addr){
 	multiboot::Info	*minfo	= nullptr;
 	VRAM::Base	*vram		= nullptr;
-	Tty			*tty		= nullptr;
 
 	// multiboot info
 	minfo = new(&_minfo) multiboot::Info();
@@ -34,46 +32,44 @@ extern "C" void kmain(multiboot::uint32_t magic, multiboot::uint32_t addr){
 	vram->init(minfo->vram_addr(), minfo->vram_width(), minfo->vram_height());
 
 	// tty
-	tty = new(&_tty) Tty();
-	tty->init(vram);
+	Tty tty(vram);
 
-	tty->clear();
-	tty->puts("booting...\n");
+	tty.clear();
+	tty << "booting...\n";
 
 	// check magic
-	tty->printf("magic=%x", magic);
+	tty << "magic=" << (uint64_t)magic;
 	if(minfo->check_magic())
-		tty->puts("\t[ok]\n");
-	tty->printf("addr=%x\n", addr);
+		tty << "\t[ok]\n";
+	tty << "addr=" << (uint64_t)addr << "\n";
 
-	tty->printf("multiboot tag num=%d\n", minfo->get_tag_num());
+	tty << "multiboot tag num=" << minfo->get_tag_num() << "\n";
 
-	tty->puts("boot loader: ");
-	tty->puts(minfo->bootloader());
-	tty->puts("\n");
+	tty << "boot loader: " << minfo->bootloader() << "\n";
 
 	auto meminfo = minfo->tags.basic_meminfo;
-	tty->printf("Memory: lower=%x, upper=%x\n", (uint64_t)meminfo->lower, (uint64_t)meminfo->upper);
+	tty << "Memory: lower=" << (uint64_t)meminfo->lower
+		<< ", upper=" << (uint64_t)meminfo->upper << "\n";
 
 	auto vraminfo = minfo->tags.framebuffer;
 
-	tty->printf("VRAM: addr=%x, pitch=%d, width=%d, height=%d, bpp=%d, mode=",
-			vraminfo->common.addr,
-			vraminfo->common.pitch,
-			vraminfo->common.width,
-			vraminfo->common.height,
-			(int)vraminfo->common.bpp);
+	tty << "VRAM: addr=" << (uint64_t)vraminfo->common.addr
+		<< ", pitch=" << vraminfo->common.pitch
+		<< ", width=" << vraminfo->common.width
+		<< ", height="<< vraminfo->common.height
+		<< ", bpp=" << (int)vraminfo->common.bpp
+		<< ", mode=";
 
 	switch(vraminfo->common.ftype){
 		using namespace multiboot;
 		case FrameBuffer::indexed:
-			tty->puts("indexed\n");
+			tty << "indexed\n";
 			break;
 		case FrameBuffer::rgb:
-			tty->puts("RGB\n");
+			tty << "RGB\n";
 			break;
 		case FrameBuffer::text:
-			tty->puts("text\n");
+			tty << "text\n";
 			break;
 	}
 
