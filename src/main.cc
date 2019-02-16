@@ -3,6 +3,7 @@
 #include "vram.h"
 #include "tty.h"
 #include "util.h"
+#include "gdt.h"
 
 void* operator new(size_t, void *buf){
 	return buf;
@@ -23,6 +24,25 @@ extern "C" void kmain(multiboot::uint32_t magic, multiboot::uint32_t addr){
 	minfo = new(&_minfo) multiboot::Info();
 	minfo->init(magic, addr);
 	minfo->parse_tags();
+
+	// GDT
+	{	// test haribote
+		using namespace GDT;
+		addr = 0x270000; //0x10000;
+		limit= 0xffff;
+
+		Desc d;
+		for(auto i=0;i<8192;i++)
+			set_desc(i, d);
+
+		d = Desc();
+		d.base(minfo->tags.load_base_addr->addr);
+		d.limit(0xfffff);
+		d.ring(0);
+		d.config = Desc::Executable | Desc::ReadOnly;
+		set_desc(0, d);
+//		load_gdtr();
+	}
 
 	// VRAM
 	using VRAM::Color;
@@ -84,7 +104,7 @@ extern "C" void kmain(multiboot::uint32_t magic, multiboot::uint32_t addr){
 	for(int i=0;i<mmap_num;i++){
 		auto& entry = mmap->entries[i];
 		tty << "\t" << i << ": base addr=" << entry.addr
-			<< ", len=" << entry.len << " ";
+			<< ",\t\tlen=" << entry.len << "\t";
 		switch(entry.type){
 		using namespace multiboot;
 		case Memory::Available:
@@ -105,6 +125,13 @@ extern "C" void kmain(multiboot::uint32_t magic, multiboot::uint32_t addr){
 		}
 		tty << "\n";
 	}
+
+	if(minfo->tags.vbe != nullptr)
+		tty << "VBE" << "\n";
+
+	if(minfo->tags.load_base_addr != nullptr)
+		tty << "load base addr = "
+			<< (uint64_t)minfo->tags.load_base_addr->addr << "\n";
 
 	while(1);
 	return;
