@@ -1,5 +1,10 @@
 #include "gdt.h"
 
+namespace GDT {
+	uint32_t addr	= 0x00000000;
+	uint16_t limit	= 0x0000;
+}
+
 using namespace GDT;
 
 void Desc::update_config(){

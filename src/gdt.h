@@ -5,10 +5,6 @@
 #include "asmfunc.h"
 
 namespace GDT {
-	// GDTR
-	inline uint16_t limit	= 0x00;
-	inline uint32_t addr	= 0x00;
-
 	// descriptor
 	struct Desc {
 		Desc(){}
@@ -90,17 +86,18 @@ namespace GDT {
 		void update_config();
 	};
 
-	// GDT
-	inline Desc::Raw *GDT = nullptr;
+	// GDTR
+	extern uint32_t addr;
+	extern uint16_t limit;
 
 	inline void set_desc(const uint16_t &num, Desc &desc){
+		auto GDT = reinterpret_cast<Desc::Raw*>(addr);
 		desc.update_config();
-		GDT = (Desc::Raw*) addr;
 		GDT[num] = desc.raw;
 	}
 
 	inline void load_gdtr(){
-		asmfunc::load_gdtr(limit, addr);
+		asmfunc::load_gdtr(limit, (uint32_t)addr);
 	}
 	inline void load_gdtr(const uint16_t limit, const uint32_t addr){
 		GDT::limit	= limit;

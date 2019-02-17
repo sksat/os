@@ -25,25 +25,6 @@ extern "C" void kmain(multiboot::uint32_t magic, multiboot::uint32_t addr){
 	minfo->init(magic, addr);
 	minfo->parse_tags();
 
-	// GDT
-	{	// test haribote
-		using namespace GDT;
-		addr = 0x270000; //0x10000;
-		limit= 0xffff;
-
-		Desc d;
-		for(auto i=0;i<8192;i++)
-			set_desc(i, d);
-
-		d = Desc();
-		d.base(minfo->tags.load_base_addr->addr);
-		d.limit(0xfffff);
-		d.ring(0);
-		d.config = Desc::Executable | Desc::ReadOnly;
-		set_desc(0, d);
-//		load_gdtr();
-	}
-
 	// VRAM
 	using VRAM::Color;
 	if(minfo->is_vram_text())
@@ -132,6 +113,40 @@ extern "C" void kmain(multiboot::uint32_t magic, multiboot::uint32_t addr){
 	if(minfo->tags.load_base_addr != nullptr)
 		tty << "load base addr = "
 			<< (uint64_t)minfo->tags.load_base_addr->addr << "\n";
+
+	// GDT test
+	{
+		tty << "GDT test \n";
+		GDT::addr = 0x10000;
+		GDT::limit	= sizeof(GDT::Desc::Raw) * 3;
+
+		tty << "base addr=" << (uint64_t)GDT::addr
+			<< ", limit=" << (uint64_t)GDT::limit << "\n";
+
+		tty << "\tselector null";
+		GDT::Desc zero;
+		zero.raw.raw64=0x00;
+		GDT::set_desc(0, zero);
+		tty << "\t[ok]\n";
+
+		tty << "\tselector 1,2";
+		GDT::Desc d1, d2;
+		d1.base(0x00);
+		d1.limit(0xffffffff);
+		d2.base(0x00);
+		d2.limit(0xffffffff);
+
+		d1.config = GDT::Desc::Executable | GDT::Desc::ReadOnly;
+		d2.config = GDT::Desc::Default;
+
+		GDT::set_desc(1, d1);
+		GDT::set_desc(2, d2);
+		tty << "\t[ok]\n";
+
+		tty << "\tload";
+		GDT::load_gdtr();
+		tty << "\t[ok]\n";
+	}
 
 	while(1);
 	return;
