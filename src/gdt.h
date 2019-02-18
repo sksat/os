@@ -90,8 +90,10 @@ namespace GDT {
 	extern uint32_t addr;
 	extern uint16_t limit;
 
-	inline void set_desc(const uint16_t &num, Desc &desc){
-		auto GDT = reinterpret_cast<Desc::Raw*>(addr);
+	extern Desc::Raw *GDT;
+
+	inline void set_desc(const uint16_t &num, Desc desc){
+		GDT = reinterpret_cast<Desc::Raw*>(addr);
 		desc.update_config();
 		GDT[num] = desc.raw;
 	}
@@ -104,6 +106,8 @@ namespace GDT {
 		GDT::addr	= addr;
 		load_gdtr(limit, addr);
 	}
+
+	void init();
 }
 
 #endif
