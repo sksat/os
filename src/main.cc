@@ -13,6 +13,15 @@ void operator delete(void*, void*) noexcept {
 
 }
 
+namespace reg {
+#define REG32(r) register uint32_t r asm(#r)
+	REG32(esp);
+	REG32(ebp);
+	REG32(esi);
+	REG32(edi);
+#undef REG32
+}
+
 multiboot::Info	_minfo;
 VRAM::TextMode	_vram_text;
 
@@ -38,6 +47,8 @@ extern "C" void kmain(multiboot::uint32_t magic, multiboot::uint32_t addr){
 
 	tty.clear();
 	tty << "booting...\n";
+	tty << "EBP: "<<(uint64_t) reg::ebp
+		<< ", ESP:" << (uint64_t)reg::esp << "\n";
 
 	// check magic
 	tty << "magic=" << Color::Red <<(uint64_t)magic << Color::White;

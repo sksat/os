@@ -1,3 +1,5 @@
+STACK_SIZE = 0x4000; /* 16KB */
+
 ENTRY(entry)
 
 SECTIONS {
@@ -17,5 +19,8 @@ SECTIONS {
 
 	.bss : {
 		*(.bss)
+		initial_stack_buffer = .;
+		. += STACK_SIZE;
+		initial_stack_buffer_end = .;
 	}
 }

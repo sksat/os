@@ -5,9 +5,6 @@
 #define HEADER_SIZE			(multiboot_header_end - multiboot_header)
 #define HEADER_CHECKSUM		-(MULTIBOOT2_HEADER_MAGIC + ARCHITECTURE + HEADER_SIZE)
 
-// size of stack (16KB)
-#define STACK_SIZE			0x4000
-
 // C function call
 #ifdef	HAVE_ASM_UNSCORE
 	#define EXT_C(fn)		_ ## fn
@@ -36,7 +33,8 @@ multiboot_header_end:
 
 entry:
 	cli
-	mov		esp, stack+STACK_SIZE	// initialize stack
+	// initialize stack
+	mov		esp, initial_stack_buffer_end
 
 	push	0
 	popf			// reset EFLAGS
@@ -48,6 +46,3 @@ entry:
 loop:
 	hlt
 	jmp		loop
-
-// stack
-	.comm	stack, STACK_SIZE

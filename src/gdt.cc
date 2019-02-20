@@ -44,12 +44,12 @@ void GDT::init(){
 	null.raw.raw64 = 0x00;
 
 	kcode.base(0x00);
-	kcode.limit(0xffffffff);
-	kcode.config = Desc::Executable | Desc::ReadOnly;
+	kcode.limit(0x0fffff);
+	kcode.config = Desc::G | Desc::System | Desc::Executable | Desc::ReadOnly;
 
 	kdata.base(0x00);
-	kdata.limit(0xffffffff);
-	kdata.config = Desc::Default;
+	kdata.limit(0x0ffff);
+	kdata.config = Desc::G | Desc::System | Desc::ReadOnly | Desc::Access;
 
 	null.update_config();
 	kcode.update_config();
