@@ -4,6 +4,7 @@
 #include "tty.h"
 #include "util.h"
 #include "gdt.h"
+#include "idt.h"
 
 void* operator new(size_t, void *buf){
 	return buf;
@@ -51,9 +52,9 @@ extern "C" void kmain(multiboot::uint32_t magic, multiboot::uint32_t addr){
 		<< ", ESP:" << (uint64_t)reg::esp << "\n";
 
 	// check magic
-	tty << "magic=" << Color::Red <<(uint64_t)magic << Color::White;
+	tty << "magic=" << Color::Red <<(uint64_t)magic;
 	if(minfo->check_magic())
-		tty << "\t[ok]\n";
+		tty.ok();
 	tty << "addr=" << Color::Red << (uint64_t)addr << Color::White << "\n";
 
 	tty << "multiboot tag num=" << minfo->get_tag_num() << "\n";
@@ -127,7 +128,11 @@ extern "C" void kmain(multiboot::uint32_t magic, multiboot::uint32_t addr){
 
 	tty << "initialize GDT";
 	GDT::init();
-	tty << "\t[ok]\n";
+	tty.ok();
+
+	tty << "initialize IDT";
+	IDT::init();
+	tty.ok();
 
 	while(1);
 	return;

@@ -3,6 +3,7 @@
 
 	.global	get_eip
 	.global load_gdtr
+	.global load_idtr
 
 .intel_syntax noprefix
 
@@ -25,4 +26,10 @@ _load_gdtr_flush:
 	mov		fs, ax
 	mov		gs, ax
 	mov		ss, ax
+	ret
+
+load_idtr:
+	mov		ax, [esp+4]
+	mov		[esp+6], ax
+	lidt	[esp+6]
 	ret

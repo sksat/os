@@ -10,6 +10,8 @@ private:
 	VRAM::Base *vram;
 
 public:
+	using Color = VRAM::Color;
+
 	Tty(VRAM::Base *vram) : x(0), y(0), vram(vram) {}
 
 	void init(VRAM::Base *vram);
@@ -19,7 +21,17 @@ public:
 	void puts(const char *str);
 	void printf(const char *fmt, ...);
 
-	using Color = VRAM::Color;
+	void ok(){
+		*this << Color::White << "\t["
+			<< Color::Green << "ok"
+			<< Color::White << "]\n";
+	}
+	void failed(){
+		*this << Color::White << "\t["
+			<< Color::Red << "failed"
+			<< Color::White << "]";
+	}
+
 	Tty& operator<<(const Color &c){
 		vram->set_color(static_cast<Color>(static_cast<uint8_t>(vram->color)>>4), c);
 		return *this;
