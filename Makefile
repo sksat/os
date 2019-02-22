@@ -6,7 +6,7 @@ IMG_DIR	= image
 BOOT_DIR= $(IMG_DIR)/boot
 GRUB_DIR= $(IMG_DIR)/boot/grub
 
-QEMU=qemu-system-x86_64
+QEMU=qemu-system-x86_64 -monitor /dev/stdout
 
 # command
 

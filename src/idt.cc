@@ -16,4 +16,16 @@ void IDT::init(){
 		set_desc(i, d);
 
 	load_idtr();
+
+	d.selector(1 * 8);
+	d.raw.type	= 0xe;
+	d.raw.S		= false;
+	d.raw.DPL	= 0;
+	d.raw.P		= true;
+
+#define SET(num) \
+	d.offset(reinterpret_cast<uint32_t>(asmfunc::_int_handler_ ## num )); \
+	set_desc(num, d);
+
+	SET(0x21);
 }

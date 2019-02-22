@@ -5,6 +5,7 @@
 #include "util.h"
 #include "gdt.h"
 #include "idt.h"
+#include "pic.h"
 
 void* operator new(size_t, void *buf){
 	return buf;
@@ -26,9 +27,18 @@ namespace reg {
 multiboot::Info	_minfo;
 VRAM::TextMode	_vram_text;
 
+VRAM::Base		*vram = nullptr;
+
+extern "C" void int_handler21(int *esp){
+	vram->clear();
+	Tty tty(vram);
+	tty.clear();
+	tty << "keyboard interrupt";
+}
+
 extern "C" void kmain(multiboot::uint32_t magic, multiboot::uint32_t addr){
 	multiboot::Info	*minfo	= nullptr;
-	VRAM::Base	*vram		= nullptr;
+//	VRAM::Base	*vram		= nullptr;
 
 	// multiboot info
 	minfo = new(&_minfo) multiboot::Info();
@@ -132,6 +142,13 @@ extern "C" void kmain(multiboot::uint32_t magic, multiboot::uint32_t addr){
 
 	tty << "initialize IDT";
 	IDT::init();
+	tty.ok();
+
+	tty << "initialize PIC";
+	PIC::init();
+	asmfunc::sti();
+
+	PIC::set_mask(PIC::IRQ1);
 	tty.ok();
 
 	while(1);

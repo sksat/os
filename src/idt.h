@@ -55,7 +55,7 @@ namespace IDT {
 	}
 
 	inline void load_idtr(){
-		asmfunc::load_idtr(limit, static_cast<uint32_t>(addr));
+		asmfunc::load_idtr(limit, addr);
 	}
 
 	void init();
