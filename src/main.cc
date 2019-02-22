@@ -6,6 +6,7 @@
 #include "gdt.h"
 #include "idt.h"
 #include "pic.h"
+#include "queue.h"
 
 void* operator new(size_t, void *buf){
 	return buf;
@@ -29,11 +30,12 @@ VRAM::TextMode	_vram_text;
 
 VRAM::Base		*vram = nullptr;
 
+queue<uint8_t, 32> kbd_data;
+
 extern "C" void int_handler21(int *esp){
-	vram->clear();
-	Tty tty(vram);
-	tty.clear();
-	tty << "keyboard interrupt";
+	asmfunc::out8(PIC::port::pic0_cmd, 0x60 + 1);	// IRQ1受付終了をPICに通知
+	auto data = asmfunc::in8(0x60); // keyboard=0x60
+	kbd_data.push(data);
 }
 
 extern "C" void kmain(multiboot::uint32_t magic, multiboot::uint32_t addr){
@@ -150,6 +152,12 @@ extern "C" void kmain(multiboot::uint32_t magic, multiboot::uint32_t addr){
 
 	PIC::set_mask(PIC::IRQ1);
 	tty.ok();
+
+	kbd_data = queue<uint8_t, 32>();
+	while(1){
+		if(kbd_data.empty()) continue;
+		tty << (uint64_t)kbd_data.pop() << "\n";
+	}
 
 	while(1);
 	return;
