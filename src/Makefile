@@ -1,5 +1,5 @@
 KERNEL	= kernel.bin
-OBJS	= boot.o main.o multiboot_info.o asmfunc.o gdt.o idt.o pic.o vram.o tty.o util.o
+OBJS	= boot.o main.o multiboot_info.o asmfunc.o gdt.o idt.o pic.o keyboard.o vram.o tty.o util.o
 
 CC		= gcc
 CXX		= g++

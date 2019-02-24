@@ -22,6 +22,8 @@ void Tty::putchar(const char c){
 		clear();
 
 	switch(c){
+	case '\0':
+		break;
 	case '\t':
 		x+=4-(x%4);
 		break;
